@@ -1,11 +1,8 @@
 from graphqlclient import GraphQLClient
-from operator import itemgetter
 import json
 
 
 class Client:
-
-    organisation_cache = {}
 
     def __init__(self, url='http://lobbywatch.ch/graphql', locale='de'):
         self.client = GraphQLClient(url)
@@ -48,28 +45,18 @@ class Client:
     def get_parliamentarian(self, id):
         body = '''
         id
+        name
         connections {
             potency
             to {
                 ... on Organisation {
                     id
+                    name
                 }
             }
         }
         '''
         return self.query('getParliamentarian', body, id=id)
-
-    def get_organisation_connections_of_parliamentarian(self, id):
-        def create_connection_dict(connection):
-            return {
-                'id': connection['to']['id'],
-                'potency': connection['potency'],
-            }
-
-        return map(
-            create_connection_dict,
-            self.get_parliamentarian(id)['connections'],
-        )
 
     def get_organisation(self, id):
         body = '''
@@ -77,16 +64,10 @@ class Client:
         name
         description
         lobbyGroups {
-            name
+            id
         }
         '''
         return self.query('getOrganisation', body, id=id)
-
-    def get_lobby_groups_from_organisation(self, id):
-        return map(
-            itemgetter('name'),
-            self.get_organisation(id)['lobbyGroups']
-        )
 
     def get_lobby_groups(self):
         body = '''
