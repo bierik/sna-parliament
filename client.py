@@ -4,6 +4,10 @@ import json
 
 class Client:
 
+    cache = {
+        'connections': {},
+    }
+
     def __init__(self, url='http://lobbywatch.ch/graphql', locale='de'):
         self.client = GraphQLClient(url)
         self.locale = locale
@@ -39,6 +43,7 @@ class Client:
     def get_parliamentarians(self):
         body = '''
         id
+        name
         '''
         return self.query('parliamentarians', body)
 
@@ -56,21 +61,25 @@ class Client:
             }
         }
         '''
-        return self.query('getParliamentarian', body, id=id)
+        return self.query('getParliamentarian', body, id=f'"{id}"')
 
     def get_organisation(self, id):
+        if self.cache['connections'].get(id):
+            return self.cache['connections'].get(id)
         body = '''
         id
         name
-        description
         lobbyGroups {
             id
         }
         '''
-        return self.query('getOrganisation', body, id=id)
+        organisation = self.query('getOrganisation', body, id=f'"{id}"')
+        self.cache['connections'][id] = organisation
+        return organisation
 
     def get_lobby_groups(self):
         body = '''
+        id
         name
         sector
         '''
