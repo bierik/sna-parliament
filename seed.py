@@ -14,30 +14,32 @@ def to_sqlite_tuple(value):
 
 c = Client()
 
-parliamentarians = c.get_parliamentarians()
-Parliamentarian.insert_many(list(map(to_sqlite_tuple, parliamentarians)))
 
-lobby_groups = c.get_lobby_groups()
-LobbyGroup.insert_many(list(map(to_sqlite_tuple, lobby_groups)))
+def seed():
+    parliamentarians = c.get_parliamentarians()
+    Parliamentarian.insert_many(list(map(to_sqlite_tuple, parliamentarians)))
 
-for parliamentarian in tqdm(parliamentarians, desc='Parliamentarians'):
-    full_parliamentarian = c.get_parliamentarian(parliamentarian['id'])
-    for connection in tqdm(full_parliamentarian['connections'], leave=False, desc='Connections'):
-        organisation = c.get_organisation(connection['to']['id'])
+    lobby_groups = c.get_lobby_groups()
+    LobbyGroup.insert_many(list(map(to_sqlite_tuple, lobby_groups)))
 
-        # Skip connections that have no lobby group assigned
-        if len(organisation['lobbyGroups']) == 0:
-            continue
+    for parliamentarian in tqdm(parliamentarians, desc='Parliamentarians'):
+        full_parliamentarian = c.get_parliamentarian(parliamentarian['id'])
+        for connection in tqdm(full_parliamentarian['connections'], leave=False, desc='Connections'):
+            organisation = c.get_organisation(connection['to']['id'])
 
-        lobby_group = organisation['lobbyGroups'][0]
+            # Skip connections that have no lobby group assigned
+            if len(organisation['lobbyGroups']) == 0:
+                continue
 
-        Organisation.insert((
-            Model.global_id(organisation['id']),
-            organisation['name'],
-        ))
-        Connection.insert((
-            connection['potency'],
-            Model.global_id(full_parliamentarian['id']),
-            Model.global_id(organisation['id']),
-            lobby_group['id'],
-        ))
+            lobby_group = organisation['lobbyGroups'][0]
+
+            Organisation.insert((
+                Model.global_id(organisation['id']),
+                organisation['name'],
+            ))
+            Connection.insert((
+                connection['potency'],
+                Model.global_id(full_parliamentarian['id']),
+                Model.global_id(organisation['id']),
+                lobby_group['id'],
+            ))
