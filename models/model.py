@@ -1,11 +1,15 @@
+import os
 import contextlib
 from contextlib import contextmanager
 import sqlite3
 
 
+database = f"{os.environ.get('SNA_DATABASE', 'data')}.db"
+
+
 @contextmanager
 def connect():
-    with contextlib.closing(sqlite3.connect('data.db')) as conn:
+    with contextlib.closing(sqlite3.connect(database)) as conn:
         with conn:
             with contextlib.closing(conn.cursor()) as cursor:
                 yield (conn, cursor)

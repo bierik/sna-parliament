@@ -111,10 +111,11 @@ class OrganisationGraph(Network):
         self._save(filename, self)
 
 
-n = LobbyGroupGraph()
-n.load()
-n.save('lobby_group')
+def generate_networks():
+    n = LobbyGroupGraph()
+    n.load()
+    n.save('lobby_group')
 
-n = OrganisationGraph()
-n.load()
-n.save('organisation')
+    n = OrganisationGraph()
+    n.load()
+    n.save('organisation')
