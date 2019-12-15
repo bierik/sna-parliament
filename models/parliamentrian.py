@@ -28,5 +28,12 @@ class Parliamentarian(Model):
         except IndexError:
             return None
 
+    @classmethod
+    def all(cls):
+        sql = '''
+        select * from parliamentarian
+        '''
+        return cls.query(sql)
+
 
 Model.query('CREATE TABLE IF NOT EXISTS parliamentarian (id integer PRIMARY KEY, name string)')

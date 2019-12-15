@@ -29,6 +29,13 @@ class LobbyGroup(Model):
         except IndexError:
             return None
 
+    @classmethod
+    def all(cls):
+        sql = '''
+        select * from lobby_group
+        '''
+        return cls.query(sql)
+
 
 Model.query('''
 CREATE TABLE IF NOT EXISTS lobby_group
