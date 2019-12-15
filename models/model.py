@@ -3,18 +3,10 @@ from contextlib import contextmanager
 import sqlite3
 
 
-def dict_factory(cursor, row):
-    d = {}
-    for idx, col in enumerate(cursor.description):
-        d[col[0]] = row[idx]
-    return d
-
-
 @contextmanager
 def connect():
     with contextlib.closing(sqlite3.connect('data.db')) as conn:
         with conn:
-            conn.row_factory = dict_factory
             with contextlib.closing(conn.cursor()) as cursor:
                 yield (conn, cursor)
 

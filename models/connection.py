@@ -28,6 +28,13 @@ class Connection(Model):
         except IndexError:
             return None
 
+    @classmethod
+    def all(cls):
+        sql = '''
+        SELECT * FROM connection ORDER BY name ASC
+        '''
+        return cls.query(sql)
+
 
 Model.query('''
 CREATE TABLE IF NOT EXISTS connection
