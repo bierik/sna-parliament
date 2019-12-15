@@ -1,3 +1,4 @@
+from normalisation_map import normalize_organisation
 from models.model import Model
 
 
@@ -26,6 +27,15 @@ class Connection(Model):
         SELECT * FROM connection
         '''
         return cls.query(sql)
+
+    @classmethod
+    def normalize_organisation(cls, source):
+        target = normalize_organisation(source)
+        sql = '''
+        UPDATE connection set organisation_id=? where organisation_id=?
+        '''
+        cur = cls.execute(sql, (target, source))
+        return cur.lastrowid
 
 
 Model.query('''
