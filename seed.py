@@ -1,6 +1,7 @@
 from client import Client
 from models.parliamentrian import Parliamentarian
 from models.connection import Connection
+from models.organisation import Organisation
 from models.lobby_group import LobbyGroup
 from models.model import Model
 from tqdm import tqdm
@@ -23,13 +24,20 @@ for parliamentarian in tqdm(parliamentarians, desc='Parliamentarians'):
     full_parliamentarian = c.get_parliamentarian(parliamentarian['id'])
     for connection in tqdm(full_parliamentarian['connections'], leave=False, desc='Connections'):
         organisation = c.get_organisation(connection['to']['id'])
-        for lobby_group in organisation['lobbyGroups']:
-            Connection.insert((
-                Model.global_id(organisation['id']),
-                organisation['name'],
-                connection['potency'],
-                parliamentarian['id'],
-                lobby_group['id'],
-            ))
 
+        # Skip connections that have no lobby group assigned
+        if len(organisation['lobbyGroups']) == 0:
+            continue
 
+        lobby_group = organisation['lobbyGroups'][0]
+
+        Organisation.insert((
+            Model.global_id(organisation['id']),
+            organisation['name'],
+        ))
+        Connection.insert((
+            connection['potency'],
+            Model.global_id(full_parliamentarian['id']),
+            Model.global_id(organisation['id']),
+            lobby_group['id'],
+        ))

@@ -5,17 +5,9 @@ class Connection(Model):
     @classmethod
     def insert(cls, connection):
         sql = '''
-        INSERT OR REPLACE INTO connection(id, name, potency, parliamentarian_id, lobby_group_id) VALUES(?,?,?,?,?)
+        INSERT OR REPLACE INTO connection(potency, parliamentarian_id, organisation_id, sector_id) VALUES(?,?,?,?)
         '''
         cur = cls.execute(sql, connection)
-        return cur.lastrowid
-
-    @classmethod
-    def insert_many(cls, connections):
-        sql = '''
-        INSERT OR REPLACE INTO connection(id, name, potency, parliamentarian_id, lobby_group_id) VALUES(?,?,?,?,?)
-        '''
-        cur = cls.execute_many(sql, connections)
         return cur.lastrowid
 
     @classmethod
@@ -31,12 +23,12 @@ class Connection(Model):
     @classmethod
     def all(cls):
         sql = '''
-        SELECT * FROM connection ORDER BY name ASC
+        SELECT * FROM connection
         '''
         return cls.query(sql)
 
 
 Model.query('''
 CREATE TABLE IF NOT EXISTS connection
-(id integer PRIMARY KEY, name string, potency string, parliamentarian_id integer, lobby_group_id integer)
+(potency integer, parliamentarian_id integer, organisation_id integer, sector_id integer)
 ''')
