@@ -31,15 +31,15 @@ def seed():
             if len(organisation['lobbyGroups']) == 0:
                 continue
 
-            lobby_group = organisation['lobbyGroups'][0]
-
             Organisation.insert((
                 Model.global_id(organisation['id']),
                 organisation['name'],
             ))
-            Connection.insert((
-                connection['potency'],
-                Model.global_id(full_parliamentarian['id']),
-                Model.global_id(organisation['id']),
-                lobby_group['id'],
-            ))
+
+            for lobby_group in organisation['lobbyGroups']:
+                Connection.insert((
+                    connection['potency'],
+                    Model.global_id(full_parliamentarian['id']),
+                    Model.global_id(organisation['id']),
+                    lobby_group['id'],
+                ))

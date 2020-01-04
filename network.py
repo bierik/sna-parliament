@@ -42,6 +42,9 @@ class Network(nx.Graph):
     def _save(self, filename, graph):
         nx.write_gexf(graph, f"{filename}.gexf")
 
+    def project(self):
+        return self
+
 
 class LobbyGroupGraph(Network):
     def load(self):
@@ -73,16 +76,22 @@ class LobbyGroupGraph(Network):
             # Connection -> Lobby Group
             self.add_edge(f"o-{connection[2]}", f"l-{connection[3]}")
 
-    def _project(self):
+    def project(self):
         g = bipartite.weighted_projected_graph(
             self,
             {n for n, d in self.nodes(data=True) if d['type'] == self.types.LOBBY_GROUP}
         )
         g.add_nodes_from(self.nodes_by_type(self.types.PARLIAMENTARIAN))
+
+        for edge in g.edges():
+            (u, v) = edge
+            if u.startswith('l') and v.startswith('l'):
+                g.remove_edge(u, v)
+
         return g
 
     def save(self, filename):
-        self._save(filename, self._project())
+        self._save(filename, self.project())
 
 
 class OrganisationGraph(Network):
