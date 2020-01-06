@@ -7,33 +7,34 @@ from models.lobby_group import LobbyGroup
 from models.organisation import Organisation
 
 
-class Types():
+class Types:
     @property
     def PARLIAMENTARIAN(self):
-        return 'parliamentarian'
+        return "parliamentarian"
 
     @property
     def LOBBY_GROUP(self):
-        return 'lobby_group'
+        return "lobby_group"
 
     @property
     def ORGANISATION(self):
-        return 'organisation'
+        return "organisation"
 
 
 class Network(nx.Graph):
     types = Types()
 
     potency_map = {
-        'HIGH': 3,
-        'MEDIUM': 2,
-        'LOW': 1,
+        "HIGH": 3,
+        "MEDIUM": 2,
+        "LOW": 1,
     }
 
     def nodes_by_type(self, t):
         def filter_by_type(node):
             _, data = node
-            return data['type'] == t
+            return data["type"] == t
+
         return list(filter(filter_by_type, self.nodes(data=True)))
 
     def _potency_to_weight(self, potency):
@@ -71,7 +72,7 @@ class LobbyGroupGraph(Network):
             self.add_edge(
                 f"p-{connection[1]}",
                 f"o-{connection[2]}",
-                weight=self._potency_to_weight(connection[0])
+                weight=self._potency_to_weight(connection[0]),
             )
             # Connection -> Lobby Group
             self.add_edge(f"o-{connection[2]}", f"l-{connection[3]}")
@@ -79,14 +80,15 @@ class LobbyGroupGraph(Network):
     def project(self):
         g = bipartite.weighted_projected_graph(
             self,
-            {n for n, d in self.nodes(data=True) if d['type'] == self.types.LOBBY_GROUP}
+            {
+                n
+                for n, d in self.nodes(data=True)
+                if d["type"] == self.types.PARLIAMENTARIAN
+            },
         )
-        g.add_nodes_from(self.nodes_by_type(self.types.PARLIAMENTARIAN))
 
-        for edge in g.edges():
-            (u, v) = edge
-            if u.startswith('l') and v.startswith('l'):
-                g.remove_edge(u, v)
+        # Add missing lobby group nodes which are missing after projecting the graph
+        g.add_nodes_from(self.nodes_by_type(self.types.LOBBY_GROUP))
 
         return g
 
@@ -113,7 +115,7 @@ class OrganisationGraph(Network):
             self.add_edge(
                 f"p-{connection[1]}",
                 f"o-{connection[2]}",
-                weight=self._potency_to_weight(connection[0])
+                weight=self._potency_to_weight(connection[0]),
             )
 
     def save(self, filename):
@@ -123,8 +125,8 @@ class OrganisationGraph(Network):
 def generate_networks():
     n = LobbyGroupGraph()
     n.load()
-    n.save('lobby_group')
+    n.save("lobby_group")
 
     n = OrganisationGraph()
     n.load()
-    n.save('organisation')
+    n.save("organisation")

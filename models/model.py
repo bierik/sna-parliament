@@ -16,7 +16,6 @@ def connect():
 
 
 class Model:
-
     @classmethod
     def execute(cls, sql, obj=()):
         with connect() as (conn, cursor):
@@ -40,4 +39,4 @@ class Model:
     def global_id(cls, id):
         if type(id) is int:
             return id
-        return id.split('-')[1]
+        return id.split("-")[1]
