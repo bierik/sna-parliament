@@ -21,7 +21,7 @@ class Types:
         return "organisation"
 
 
-class Network(nx.Graph):
+class Network(nx.DiGraph):
     types = Types()
 
     potency_map = {
@@ -45,6 +45,28 @@ class Network(nx.Graph):
 
     def project(self):
         return self
+
+    def load_graph(self):
+        self.load()
+        return self.project()
+
+    def _sorted_degree(self, degree_view):
+        degree = []
+        for node, value in degree_view:
+            degree.append((node, value))
+
+        degree = filter(lambda node: node[1] > 0, degree)
+        degree = sorted(degree, key=lambda tup: tup[1])
+        degree.reverse()
+        return degree
+
+    def sorted_out_degree(self):
+        graph = self.load_graph()
+        return self._sorted_degree(graph.out_degree(weight="weight"))
+
+    def sorted_in_degree(self):
+        graph = self.load_graph()
+        return self._sorted_degree(graph.in_degree(weight="weight"))
 
 
 class LobbyGroupGraph(Network):

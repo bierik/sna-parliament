@@ -1,31 +1,48 @@
 from network import LobbyGroupGraph, OrganisationGraph
 
 
-def load_graph(graph):
-    graph.load()
-    return graph.project()
+def enrich_degree(degree, node):
+    node.update({"degree": degree[1]})
+    return node
 
 
-def sort_degree(graph):
-    sorted_degree = []
-    degree = graph.degree(weight='weight')
-    for node, value in degree:
-        sorted_degree.append((node, value))
-
-    sorted_degree = sorted(sorted_degree, key=lambda tup: tup[1])
-    sorted_degree.reverse()
-    return sorted_degree
+def resolve_nodes_in_degree(degree, graph):
+    return map(lambda d: enrich_degree(d, graph.nodes[d[0]]), degree)
 
 
-def sort_graph(graph, degree):
-    return map(lambda node: graph.nodes[node[0]], degree)
+def top_parliamentarians(limit=10):
+    graph = LobbyGroupGraph()
+    degree = graph.sorted_out_degree()
+    return resolve_nodes_in_degree(degree, graph)
 
 
-def sort_nodes_by_type(graph, type):
-    return filter(lambda node: node[0].startswith(type), sort_degree(graph))
+def top_organisations(limit=10):
+    graph = OrganisationGraph()
+    degree = graph.sorted_in_degree()
+    return resolve_nodes_in_degree(degree, graph)
 
 
-def organisations(limit):
-    graph = load_graph(OrganisationGraph())
-    degree = sort_nodes_by_type(graph, 'o')
-    return list(sort_graph(graph, degree))[:limit]
+def top_lobby_groups(limit=10):
+    graph = LobbyGroupGraph()
+    degree = graph.sorted_in_degree()
+    return resolve_nodes_in_degree(degree, graph)
+
+
+print("************************************")
+print("Parliamentarians")
+print("************************************")
+for a in list(top_parliamentarians())[:30]:
+    print(f"{a['label']}: {a['degree']}")
+print("************************************")
+
+print("Organisations")
+print("************************************")
+for a in list(top_organisations())[:30]:
+    print(f"{a['label']}: {a['degree']}")
+print("************************************")
+
+print("Lobby Groups")
+print("************************************")
+for a in list(top_lobby_groups())[:30]:
+    print(f"{a['label']}: {a['degree']}")
+print("************************************")
