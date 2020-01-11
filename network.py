@@ -68,6 +68,44 @@ class Network(nx.DiGraph):
         graph = self.load_graph()
         return self._sorted_degree(graph.in_degree(weight="weight"))
 
+    def sorted_normalized_out_degree(self):
+        graph = self.load_graph()
+        degrees = self._sorted_degree(graph.out_degree(weight="weight"))
+        max_out_degree = self.sum_out_degree()
+        return map(
+            lambda d: {
+                "label": graph.nodes[d[0]]["label"],
+                "degree": d[1] / max_out_degree,
+            },
+            degrees,
+        )
+
+    def sorted_normalized_in_degree(self):
+        graph = self.load_graph()
+        degrees = self._sorted_degree(graph.in_degree(weight="weight"))
+        max_in_degree = self.sum_in_degree()
+        return map(
+            lambda d: {
+                "label": graph.nodes[d[0]]["label"],
+                "degree": d[1] / max_in_degree,
+            },
+            degrees,
+        )
+
+    def _degree(self, degree_view):
+        degree = []
+        for _, value in degree_view:
+            degree.append(value)
+        return degree
+
+    def sum_out_degree(self):
+        graph = self.load_graph()
+        return sum(self._degree(graph.out_degree(weight="weight")))
+
+    def sum_in_degree(self):
+        graph = self.load_graph()
+        return sum(self._degree(graph.in_degree(weight="weight")))
+
 
 class LobbyGroupGraph(Network):
     def load(self):
