@@ -51,7 +51,7 @@ The normalization step is done in place. Meaning that the currently connected da
 We use [gephi](https://gephi.org/) to properly visualize the graph.
 
 ```python
-from network import from network import generate_networks
+from network import generate_networks
 ```
 
 The `generate_networks` function will generate two `.gexf` files. The `lobby_group.gexf`-file contains a weighted bipartite graph with all parliamentarians connected to the lobby groups.

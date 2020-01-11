@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 
 def to_sqlite_tuple(value):
-    value['id'] = Model.global_id(value['id'])
+    value["id"] = Model.global_id(value["id"])
     return tuple(value.values())
 
 
@@ -22,24 +22,27 @@ def seed():
     lobby_groups = c.get_lobby_groups()
     LobbyGroup.insert_many(list(map(to_sqlite_tuple, lobby_groups)))
 
-    for parliamentarian in tqdm(parliamentarians, desc='Parliamentarians'):
-        full_parliamentarian = c.get_parliamentarian(parliamentarian['id'])
-        for connection in tqdm(full_parliamentarian['connections'], leave=False, desc='Connections'):
-            organisation = c.get_organisation(connection['to']['id'])
+    for parliamentarian in tqdm(parliamentarians, desc="Parliamentarians"):
+        full_parliamentarian = c.get_parliamentarian(parliamentarian["id"])
+        for connection in tqdm(
+            full_parliamentarian["connections"], leave=False, desc="Connections"
+        ):
+            organisation = c.get_organisation(connection["to"]["id"])
 
             # Skip connections that have no lobby group assigned
-            if len(organisation['lobbyGroups']) == 0:
+            if len(organisation["lobbyGroups"]) == 0:
                 continue
 
-            lobby_group = organisation['lobbyGroups'][0]
+            Organisation.insert(
+                (Model.global_id(organisation["id"]), organisation["name"],)
+            )
 
-            Organisation.insert((
-                Model.global_id(organisation['id']),
-                organisation['name'],
-            ))
-            Connection.insert((
-                connection['potency'],
-                Model.global_id(full_parliamentarian['id']),
-                Model.global_id(organisation['id']),
-                lobby_group['id'],
-            ))
+            for lobby_group in organisation["lobbyGroups"]:
+                Connection.insert(
+                    (
+                        connection["potency"],
+                        Model.global_id(full_parliamentarian["id"]),
+                        Model.global_id(organisation["id"]),
+                        lobby_group["id"],
+                    )
+                )
