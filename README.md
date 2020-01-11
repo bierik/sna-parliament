@@ -52,10 +52,22 @@ We use [gephi](https://gephi.org/) to properly visualize the graph.
 
 ```python
 from network import generate_networks
+
+generate_networks()
 ```
 
 The `generate_networks` function will generate two `.gexf` files. The `lobby_group.gexf`-file contains a weighted bipartite graph with all parliamentarians connected to the lobby groups.
 The `organisations.gexf`-file contains a weighted bipartite graph with all parliamentarians connected to the organisations.
+
+### Network Analysis
+
+To generate all analyzes as a `.csv` file.
+
+```python
+from analyse import generate_analysis
+
+generate_analysis()
+```
 
 ### Main Script
 

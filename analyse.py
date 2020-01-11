@@ -1,7 +1,6 @@
 import os
 import csv
 from network import LobbyGroupGraph, OrganisationGraph
-from networkx.algorithms.centrality import degree_centrality
 
 
 def enrich_degree(degree, node):
@@ -66,6 +65,3 @@ def generate_analysis():
     write_csv("nomalized_parliamentarians", list(normalized_parliamentarian_degrees()))
     write_csv("normalized_organisations", list(normalized_organisations_degrees()))
     write_csv("normalized_lobby_groups", list(normalized_lobby_group_degrees()))
-
-
-generate_analysis()
